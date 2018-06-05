@@ -1,0 +1,8 @@
+SOQL for Group Users-
+
+
+Select Id, Name, lastLoginDate,Business_Unit__c, MSID__c,T1C_User_Short_ID__c from user where Id in  (SELECT UserOrGroupId from groupmember where groupid in ('00G800000028Y2Z','00G800000028Y2S','00G800000028Y2U','00G800000028Y2N')) and isactive=true
+
+SOQL for Ace Logs , get the usage
+
+SELECT CreatedBy.Name,CreatedById,COUNT_DISTINCT(Createddatetimestamp__c )from T1C_Base__ACE_Log__c where createdDate>2016-03-01T00:00:00.000Z  and createdDate<2016-03-31T23:59:59.000Z group by CreatedBy.Name,CreatedById 
