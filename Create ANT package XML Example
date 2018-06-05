@@ -1,0 +1,143 @@
+// Below file is just a POC and not complete.
+
+
+
+
+//Schema.DescribeFieldResult dd=Schema.SObjectType.FIX_Infrastructure_Request__c.fields.Asset_Class__c;
+//system.debug(dd);
+//system.debug(dd.getType());
+//system.debug(dd.getRelationshipOrder());
+//system.debug(dd.isWriteRequiresMasterRead());
+/*
+Schema.DescribeFieldResult dd1=Schema.SObjectType.DistributionListItem__c.fields.GPSContact__c;
+system.debug('Lookup');
+system.debug(dd1.getType());
+system.debug(dd1.getRelationshipOrder());
+system.debug(dd1.isWriteRequiresMasterRead());*/
+//List<Schema.PicklistEntry> pe= dd.getPickListValues();
+
+//pe= (List<Schema.PicklistEntry>)json.deserialize(Json.serialize(pe), List<Schema.PicklistEntry>.class)     ;
+//system.debug(pe);
+
+
+
+
+// Describe Call
+
+
+Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.Opportunity.fields.getMap();
+
+string container;
+
+for(Schema.SObjectField ss:fieldMap.Values() ){  
+    
+    Schema.DescribeFieldResult dfr = ss.getDescribe();
+    
+    if(dfr.isCustom()){
+        
+    
+        container=container+'<fields>';
+        container+='<fullName>'+ dfr.getName()+'</fullName>';
+        if(dfr.getType()==Schema.DisplayType.BOOLEAN)
+            container+='<defaultValue>'+dfr.getDefaultValue() +'</defaultValue>';
+        
+        container+='<externalId>'+ dfr.isExternalID()+'</externalId>';
+        container+='<label>' + dfr.getLabel()+ '</label>';
+        
+        if(dfr.getType()==Schema.DisplayType.PICKLIST || dfr.getType()==Schema.DisplayType.MULTIPICKLIST){
+            container+='<picklist>';
+            boolean dependent=dfr.isDependentPicklist();
+            if(dependent){
+                
+                container+='<controllingField>'+ dfr.getController()+'</controllingField>';
+            }
+            for(Schema.PicklistEntry pe: dfr.getPicklistValues()){
+                
+                container+='<picklistValues>';
+                container+='<fullName>' + pe.getLabel()+ '</fullName>';
+                container+='<default>' + pe.isDefaultValue()+ '</default>';
+                
+                if(dependent){
+                    
+                    container+='<controllingFieldValues>'+ +'</controllingFieldValues>';
+                    
+                }
+                
+                container+='</picklistValues>';            
+                
+            }
+            
+            container+='</picklist>';
+        }
+        
+        if(dfr.getType()==Schema.DisplayType.REFERENCE){
+            container+='<referenceTo>' +dfr.getReferenceTo() + '</referenceTo>';
+            container+='<relationshipName>' +dfr.getRelationshipName() + '</relationshipName>';
+        }
+            
+        
+        if(dfr.getType()==Schema.DisplayType.STRING){
+            container+='<length>' + dfr.getLength()+ '</length>';
+        }
+            
+        container+='<required>'+ dfr.isNillable()+'</required>';
+        container+='<trackHistory>'+'false' +'</trackHistory>';
+        container+='<trackTrending>'+'false' +'</trackTrending>';
+        container+='<type>';
+        if(dfr.getType()==Schema.DisplayType.REFERENCE ){
+            
+            container+= dfr.getRelationshipOrder()==null?'Lookup':'MasterDetail' ;
+            
+        }
+        else if(dfr.getType()==schema.DisplayType.TEXTAREA){
+            
+            container+= dfr.isHtmlFormatted()?'Html':'LongTextArea';
+        }
+        else if(dfr.getType()==schema.DisplayType.Double) {
+            
+            container+= 'Number';
+        }
+        
+        else if(dfr.getType()==Schema.DisplayType.STRING){
+            container+= 'Text';
+        }
+        
+        else if(dfr.getType()==Schema.DisplayType.PICKLIST){
+            container+= 'Picklist';
+        }
+        
+        else if(dfr.getType()==schema.DisplayType.BOOLEAN){
+            container+= 'Checkbox';
+        }
+        
+        else if(dfr.getType()==schema.DisplayType.DATE){
+            container+= 'Date';
+        }
+        
+        else if(dfr.getType()==schema.DisplayType.DATETIME){
+            container+= 'DateTime';
+        }
+                
+        else if(dfr.getType()==schema.DisplayType.MULTIPICKLIST){
+            container+= 'MultiselectPicklist';
+        }
+        else{
+            container+= String.ValueOf(dfr.getType()).capitalize();
+        }
+        
+        container+='</type>';
+        
+        if(dfr.getType()==schema.DisplayType.MULTIPICKLIST){
+            
+            container+='<visibleLines>'+ dfr.getPrecision()+'</visibleLines>';
+        }
+        
+        if(dfr.getType()==Schema.DisplayType.STRING || dfr.getType()==Schema.DisplayType.Double){
+            container+='<unique>'+ dfr.isUnique()+'</unique>';
+        }
+        container=container+'</fields>';
+        
+    }
+}
+
+system.debug('XML'+container);
