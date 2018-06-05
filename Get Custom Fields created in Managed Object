@@ -1,0 +1,44 @@
+//Script-
+
+
+
+Map<String, Schema.SObjectType> gd = Schema.getGlobalDescribe();
+
+map<string, Schema.DescribeSObjectResult> objectnames= new map<string, Schema.DescribeSObjectResult>();
+
+string xml;
+
+for(Schema.SobjectType objType: gd.values()){
+    
+	Schema.DescribeSObjectResult objectresult= objType.getDescribe();
+    
+    if(objectresult.iscustom() && !objectresult.isCustomsetting() && objectresult.getLocalName().containsignorecase('t1c_base')){
+       
+        //system.debug(objectresult.getName());
+        
+        map<string, sobjectfield> fields= objectresult.fields.getMap();
+        
+        for(string s:fields.keyset()){
+            
+            sObjectField token=fields.get(s);
+            DescribeFieldResult selectedfield=token.getDescribe();
+            
+            if(!selectedfield.getLocalName().containsignorecase('t1c_base') && selectedfield.iscustom()){
+                
+                //system.debug(objectresult.getName());
+                //system.debug(selectedfield.getLocalName());
+                //system.debug(objectresult.getName()+'.'+selectedfield.getLocalName());
+                
+                xml=xml+'<members>'+objectresult.getLocalName()+'.'+selectedfield.getLocalName()+'</members>';
+                //system.debug(xml);
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+system.debug(xml);
+
