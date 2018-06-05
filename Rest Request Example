@@ -1,0 +1,20 @@
+// Tooling Api Rest Call
+// Can be used to make calls to apex rest services.
+
+
+String salesforceHost = System.Url.getSalesforceBaseURL().toExternalForm();
+string endpoint=salesforceHost+'/services/data/v42.0/sobjects/Opportunity/describe';
+
+//body='{"Metadata" : {'+system.debug(JSON.serialize(dfr)) +'},';
+http h = new http();
+HttpRequest req = new HttpRequest();
+req.setHeader('Authorization', 'Bearer ' + UserInfo.getSessionId());
+req.setheader('Content-Type', 'application/json');
+//req.setHeader('Accept','application/json');
+req.setEndpoint(endpoint);
+req.setMethod('GET');
+
+system.debug('Request=' +req);
+httpResponse res= new httpResponse();
+res= h.send(req);
+system.debug(res.getBody());
